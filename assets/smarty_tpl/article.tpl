@@ -46,7 +46,7 @@
               <div class="tab-content">
                   <div class="tab-pane active" id="comments-display">
                       <ul class="media-list">
-                      {**********Si $tab_article[0].id_article est différent de NULL alors on affiche les commentaires**********}
+                      {**********Si $tab_article[0].id_article est différent de NULL/vide alors on affiche les commentaires**********}
                       {if {$tab_article[0].id_article} != NULL}
                       {foreach $tab_article as $com}
                         <li class="media">
@@ -66,7 +66,7 @@
                           </div>
                         </li>
                         {/foreach}
-                        {**********Sinon cela signifie que $tab_article[0].id_article est à NULL/vide donc aucun commentaire trouvé**********}
+                        {**********Sinon cela signifie que $tab_article[0].id_article est à NULL/vide et donc aucun commentaire trouvé**********}
                         {else}
                         <li class="media">
                           <div class="media-body">

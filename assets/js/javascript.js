@@ -26,10 +26,10 @@ $(document).ready(function() {
 function checkForm() {
   //On met la valeur de 'email' dans la variable email
   var email = document.getElementById("email").value;
-  //On met la valeur de 'message' dans la variable pseudo
+  //On met la valeur de 'pseudo' dans la variable pseudo
   var message = document.getElementById("message").value;
 
-
+  //Si email est à null ou email est vide
   if(email == null || email == "")
   {
     //On change la couleur de la bordure de l'élément concerné
@@ -40,6 +40,7 @@ function checkForm() {
     return false;
   }
 
+  //Si message est à null ou message est vide
   if(message == null || message == "")
   {
     //On change la couleur de la bordure de l'élément concerné
