@@ -1,4 +1,4 @@
-{**********Page affichée que lorsqu'on est connecté**********}
+{**********Page affichée que lorsqu'on n'est pas connecté**********}
 {if $is_logged_in == FALSE}
 <!-- Page Content -->
   <div class="container div_maincontent">
