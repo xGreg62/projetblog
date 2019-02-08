@@ -31,16 +31,22 @@ $nb_pages_connecte = ceil($nb_total_art / _nb_art_page) ;
 //Si la variable $_COOKIE['sid'] est définie alors
 if (isset($_COOKIE['sid'])) {
 
-    //Requête SQL d'utilisateur connecté
+    //Requête SQL d'utilisateur connecté avec calcul du nombre de commentaires
     $sql_select_connecte =
-        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,
-        DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
-        FROM articles t1
-        INNER JOIN auteurs
-        AS t2
-        ON t1.id_auteur = t2.id
-        ORDER BY date
-        LIMIT :index_depart, :nb_limit";
+        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article, COUNT(t3.message) as 'nb',
+          DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
+          FROM articles t1
+          INNER JOIN auteurs
+          AS t2
+          ON t1.id_auteur = t2.id
+          LEFT JOIN commentaires
+          AS t3
+          ON t1.id = t3.id_article
+          GROUP BY t1.id
+          ORDER BY t1.id
+          LIMIT :index_depart, :nb_limit";
+
+    //Sécurisation des données
     $sth = $bdd->prepare($sql_select_connecte);
     $sth->bindValue(':index_depart', $index_depart, PDO::PARAM_INT);
     $sth->bindValue(':nb_limit', _nb_art_page, PDO::PARAM_INT);
@@ -55,6 +61,7 @@ if (isset($_COOKIE['sid'])) {
     $smarty->setTemplateDir('templates/');
     $smarty->setCompileDir('templates_c/');
 
+    //Déclaration des variables à Smarty
     $smarty->assign('tab_articles', $tab_articles);
     $smarty->assign('is_logged_in', $is_logged_in);
     $smarty->assign('nb_pages_connecte', $nb_pages_connecte);
@@ -78,17 +85,23 @@ if (isset($_COOKIE['sid'])) {
 }
 //Sinon si $_COOKIE['sid'] n'est pas définie alors
 elseif (!isset($_COOKIE['sid'])) {
-    //Requete SQL d'utilisateur non connecté
-    $sql_select_non_connecte =
-          "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,
-          DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
-          FROM articles t1
-          INNER JOIN auteurs
-          AS t2
-          ON t1.id_auteur = t2.id
-          WHERE publie = :publie
-          ORDER BY date
-          LIMIT :index_depart, :nb_limit";
+
+  //Requete SQL d'utilisateur non connecté avec calcul du nombre de commentaires
+  $sql_select_non_connecte =
+      "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article, COUNT(t3.message) as 'nb',
+        DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
+        FROM articles t1
+        INNER JOIN auteurs
+        AS t2
+        ON t1.id_auteur = t2.id
+        LEFT JOIN commentaires
+        AS t3
+        ON t1.id = t3.id_article
+        WHERE publie = :publie
+        GROUP BY t1.id
+        ORDER BY t1.id
+        LIMIT :index_depart, :nb_limit";
+
     $sth = $bdd->prepare($sql_select_non_connecte);
     $sth->bindValue(':publie', 1, PDO::PARAM_BOOL);
     $sth->bindValue(':index_depart', $index_depart, PDO::PARAM_INT);
@@ -104,6 +117,8 @@ elseif (!isset($_COOKIE['sid'])) {
     $smarty->setTemplateDir('templates/');
     $smarty->setCompileDir('templates_c/');
 
+
+    //Déclaration des variables à Smarty
     $smarty->assign('tab_articles', $tab_articles);
     $smarty->assign('is_logged_in', $is_logged_in);
     $smarty->assign('nb_pages_connecte', $nb_pages_connecte);

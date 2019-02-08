@@ -40,6 +40,7 @@
           <p>{$article.nom} {$article.prenom}</p>
           <p>{$article.texte}... <a href="article.php?type=read&id={$article.id}">Lire la suite</a></p>
           <p class="card-text">{$article.datefr}</p>
+          <p class="card-text">{$article.nb} commentaire(s)</p>
           <a href="article.php?type=read&id={$article.id}" class="btn btn-classic bg-red">Lire l'article</a>
           <a href="article.php?type=edit&id={$article.id}" class="btn btn-warning">Modifier l'article</a>
           <a href="article.php?type=delete&id={$article.id}" class="btn btn-danger">Supprimer l'article</a>
@@ -93,6 +94,7 @@
           <p>{$article.nom} {$article.prenom}</p>
           <p>{$article.texte}... <a href="article.php?type=read&id={$article.id}">Lire la suite</a></p>
           <p class="card-text">{$article.datefr}</p>
+          <p class="card-text">{$article.nb} commentaire(s)</p>
           <a href="article.php?type=read&id={$article.id}" class="btn btn-classic bg-red">Lire l'article</a>
         </div>
       </div>
