@@ -43,7 +43,7 @@ if (isset($_COOKIE['sid'])) {
           AS t3
           ON t1.id = t3.id_article
           GROUP BY t1.id
-          ORDER BY t1.id
+          ORDER BY t1.date
           LIMIT :index_depart, :nb_limit";
 
     //Sécurisation des données
@@ -99,7 +99,7 @@ elseif (!isset($_COOKIE['sid'])) {
         ON t1.id = t3.id_article
         WHERE publie = :publie
         GROUP BY t1.id
-        ORDER BY t1.id
+        ORDER BY t1.date
         LIMIT :index_depart, :nb_limit";
 
     $sth = $bdd->prepare($sql_select_non_connecte);

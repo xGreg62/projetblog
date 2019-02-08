@@ -35,18 +35,22 @@ if (isset($_GET['rechercher'])) {
     if (isset($_COOKIE['sid'])) {
         //Requête SQL permettant de rechercher TOUS les articles
         $sql_select_search =
-        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,
+        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article,COUNT(t3.message) as 'nb',
         DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
         FROM articles t1
         INNER JOIN auteurs
         AS t2
         ON t1.id_auteur = t2.id
+        LEFT JOIN commentaires
+        AS t3
+        ON t1.id = t3.id_article
         WHERE (titre LIKE :search
           OR texte LIKE :search
           OR nom LIKE :search
           OR prenom LIKE :search
-          OR date LIKE :search)
-        ORDER BY date";
+          OR t1.date LIKE :search)
+        GROUP BY t1.id
+        ORDER BY t1.date";
         $sth = $bdd->prepare($sql_select_search);
         $sth->bindValue(':search', $val_search, PDO::PARAM_STR);
         $sth->execute();
@@ -88,19 +92,23 @@ if (isset($_GET['rechercher'])) {
     //car lorsqu'on n'est pas connecté, seuls les articles publiés sont affichés
     elseif (!isset($_COOKIE['sid'])) {
         $sql_select_search =
-        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,
+        "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article,COUNT(t3.message) as 'nb',
         DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
         FROM articles t1
         INNER JOIN auteurs
         AS t2
         ON t1.id_auteur = t2.id
+        LEFT JOIN commentaires
+        AS t3
+        ON t1.id = t3.id_article
         WHERE publie = 1
         AND (titre LIKE :search
           OR texte LIKE :search
           OR nom LIKE :search
           OR prenom LIKE :search
-          OR date LIKE :search)
-        ORDER BY date";
+          OR t1.date LIKE :search)
+        GROUP BY t1.id
+        ORDER BY t1.date";
         $sth = $bdd->prepare($sql_select_search);
         $sth->bindValue(':search', $val_search, PDO::PARAM_STR);
         $sth->execute();
