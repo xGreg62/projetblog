@@ -20,9 +20,13 @@ $sql_select =
 "SELECT *
 FROM auteurs
 ORDER BY id;";
+
+//Préparation à l'exécution de la requête en liant la config de la bdd
 $sth = $bdd->prepare($sql_select);
+//Exécution de la requête
 $sth->execute();
 
+//On met les données dans un tableau
 $tab_auteurs = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 
