@@ -14,14 +14,15 @@ require_once "assets/include/connexion.inc.php" ;
 
 if (isset($_POST['connexion_usr'])) {
 
-    /* @var $bdd PDO*/
+    //Requête SQL de sélection de l'utilisateur correspondant aux données
     $sql_select = "SELECT * FROM users WHERE email = :email AND mdp = :mdp";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_select);
+    //Sécurisation des données envoyées
     $sth->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
     $sth->bindValue(':mdp', cryptPassword($_POST['password']), PDO::PARAM_STR);
-
+    //Exécution de la requête
     $sth->execute();
 
     //Si $sth ne retourne rien, alors soit le compte n'existe pas soit utilisateur incorrect
@@ -40,13 +41,12 @@ if (isset($_POST['connexion_usr'])) {
         //Requete SQL update pour mettre le SID dans la table où l'email correspond à l'utilisateur
         $sql_update = "UPDATE users SET sid = :sid WHERE email = :email ;";
 
-        /* @var DBB PDO */
+        //Préparation à l'exécution de la requête en liant la config de la bdd
         $sth_update = $bdd->prepare($sql_update);
-
-        /* Sécurisation des variables */
+        //Sécurisation des données envoyées
         $sth_update->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
         $sth_update->bindValue(':sid', $sid, PDO::PARAM_STR);
-
+        //Exécution de la requête
         $result_update = $sth_update->execute();
 
         //On crée le cookie avec le SID et une durée de vie au cookie
@@ -91,7 +91,7 @@ if (isset($_SESSION['notifications'])) {
 include_once "assets/include/header.inc.php" ;
 include_once "assets/include/menunav_nosearch.inc.php" ;
 
-// Affichage de la vue connexion via smarty
+//Affichage de la vue connexion via smarty
 $smarty->display('assets/smarty_tpl/login.tpl');
 
 

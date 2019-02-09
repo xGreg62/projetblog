@@ -15,22 +15,18 @@ require_once "assets/include/connexion.inc.php" ;
 $type = isset($_GET['type']) ? $_GET['type'] : 'default';
 
 if (isset($_POST['inscription_usr'])) {
-    //print_r2($_POST);
-    //print_r2($_FILES);
-
-    /* @var $bdd PDO*/
+    //Requête SQL d'insertion d'utilisateur
     $sql_insert = "INSERT INTO users (nom,prenom,email,mdp) VALUES (:nom, :prenom, :email, :mdp)";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_insert);
+    //Sécurisation des données envoyées
     $sth->bindValue(':nom', $_POST['nom'], PDO::PARAM_STR);
     $sth->bindValue(':prenom', $_POST['prenom'], PDO::PARAM_STR);
     $sth->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
     $sth->bindValue(':mdp', cryptPassword($_POST['password']), PDO::PARAM_STR);
-
+    //Exécution de la requête
     $result = $sth->execute();
-
-    //var_dump($result);
 
     //Ajout du texte pour l'utilisateur dans une variable et de la valeur pour déterminer si c'est un succès ou une erreur
     $notification = "<b>Vous êtes maintenant inscrit ! Veuillez vous connecter</b>";

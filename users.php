@@ -18,9 +18,13 @@ $sql_select =
 "SELECT *
 FROM users
 ORDER BY id;";
+
+//Préparation à l'exécution de la requête en liant la config de la bdd
 $sth = $bdd->prepare($sql_select);
+//Exécution de la requête
 $sth->execute();
 
+//Insère les données dans un tableau
 $tab_utilisateurs = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 /********* TRAITEMENT SMARTY  *********/
@@ -29,7 +33,7 @@ $smarty = new Smarty();
 $smarty->setTemplateDir('templates/');
 $smarty->setCompileDir('templates_c/');
 
-// On donne les variables pour l'affichage à smarty
+//Envoie des variables à Smarty
 $smarty->assign('is_logged_in', $is_logged_in);
 $smarty->assign('tab_utilisateurs', $tab_utilisateurs);
 

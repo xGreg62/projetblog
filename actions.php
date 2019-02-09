@@ -19,8 +19,9 @@ if (isset($_POST['ajouter'])) {
     /* Requete SQL d'insertion dans la table "articles"*/
     $sql_insert = "INSERT INTO articles (titre,texte,date,publie,id_auteur) VALUES (:titre, :texte, :date, :publie, :auteur)";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_insert);
+    //Sécurisation des données envoyées
     $sth->bindValue(':titre', $_POST['titre'], PDO::PARAM_STR);
     $sth->bindValue(':texte', $_POST['texte'], PDO::PARAM_STR);
     $sth->bindValue(':publie', $_POST['publie'], PDO::PARAM_BOOL);
@@ -72,8 +73,9 @@ if (isset($_POST['modifier'])) {
     /* Requete SQL Update de la table "articles" */
     $sql_update = "UPDATE articles SET titre=:titre, texte=:texte, date = DATE(STR_TO_DATE(:datefr, '%d/%m/%Y')), publie=:publie, id_auteur=:id_auteur WHERE id=:art_id";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_update);
+    //Sécurisation des données envoyées
     $sth->bindValue(':titre', $_POST['titre'], PDO::PARAM_STR);
     $sth->bindValue(':texte', $_POST['texte'], PDO::PARAM_STR);
     $sth->bindValue(':datefr', $_POST['datefr'], PDO::PARAM_STR);
@@ -124,19 +126,25 @@ if (isset($_POST['modifier'])) {
 //Si $_POST['supprimer'] est défini alors
 if (isset($_POST['supprimer'])) {
 
-    /* Requete SQL Delete de la table "articles" */
+    //Requete SQL Delete de la table "articles"
     $sql_delete = "DELETE FROM articles WHERE id=:art_id";
+    //Requête SQL de suppression des commentaires de l'article
+    $sql_del_coms = "DELETE FROM commentaires WHERE id_article = :art_id";
 
+    //Préparation à l'exécution des requêtes en liant la config de la bdd
+    $sth_art = $bdd->prepare($sql_delete);
+    $sth_coms = $bdd->prepare($sql_del_coms);
     //Sécurisation des données envoyées
-    $sth = $bdd->prepare($sql_delete);
-    $sth->bindValue(':art_id', $_POST['art_id'], PDO::PARAM_INT);
-    //Exécution de la requête
-    $result = $sth->execute();
+    $sth_art->bindValue(':art_id', $_POST['art_id'], PDO::PARAM_INT);
+    $sth_coms->bindValue(':art_id', $_POST['art_id'], PDO::PARAM_INT);
+    //Exécution des requêtes
+    $del_art = $sth_art->execute();
+    $del_coms = $sth_coms->execute();
 
-    //Récupération de l'id de l'article inséré pour le lier à l'image
+    //Récupération de l'id de l'article à supprimer pour supprimer l'image liée
     $id_article = $_POST['art_id'];
 
-    //Suppression de l'ancienne image
+    //Suppression de l'image liée à l'article
     unlink('assets/imgs/'.$id_article.'.jpg');
 
     //Ajout du texte pour l'utilisateur dans une variable et de la valeur pour déterminer si c'est un succès ou une erreur
@@ -167,8 +175,9 @@ if (isset($_POST['addComment'])) {
     /* Requete SQL Insert dans la table "commentaires" */
     $sql_insert = "INSERT INTO commentaires (id_article,pseudo,email,message,date) VALUES (:art_id, :pseudo, :email, :message, :datemsg)";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_insert);
+    //Sécurisation des données envoyées
     $sth->bindValue(':art_id', $_POST['art_id'], PDO::PARAM_INT);
     $sth->bindValue(':pseudo', $_POST['pseudo'], PDO::PARAM_STR);
     $sth->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
@@ -206,12 +215,12 @@ if (isset($_POST['addComment'])) {
 /*********************** ACTIONS SUR LES UTILISATEURS ************************/
 /***************************** Ajout utilisateur *****************************/
 if (isset($_POST['ajouter_usr'])) {
-
     /* Requete SQL Insert dans la table "users" */
     $sql_insert = "INSERT INTO users (nom,prenom,email,mdp) VALUES (:nom, :prenom, :email, :mdp)";
 
-    //Sécurisation des données envoyées
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_insert);
+    //Sécurisation des données envoyées
     $sth->bindValue(':nom', $_POST['nom'], PDO::PARAM_STR);
     $sth->bindValue(':prenom', $_POST['prenom'], PDO::PARAM_STR);
     $sth->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
@@ -252,8 +261,10 @@ if (isset($_REQUEST['supprimer_usr'])) {
 
         //SQL_select pour vérifier si l'utilisateur connecté est sélectionné
         $sql_select = "SELECT * FROM users WHERE id=:id";
-        //Sécurisation des données envoyées
+
+        //Préparation à l'exécution de la requête en liant la config de la bdd
         $sth = $bdd->prepare($sql_select);
+        //Sécurisation des données envoyées
         $sth->bindValue(':id', $del_id, PDO::PARAM_STR);
         //Exécution de la requête
         $sth->execute();
@@ -280,9 +291,12 @@ if (isset($_REQUEST['supprimer_usr'])) {
           $prenom_usr = '';
           $nom_usr = '' ;
 
-          //Exécution de la suppression du compte utilisateur
+
+          //Requête SQL afin de supprimer le compte utilisateur
           $sql_delete = "DELETE FROM users WHERE id='$del_id';";
+          //Préparation à l'exécution de la requête en liant la config de la bdd
           $sth = $bdd->prepare($sql_delete);
+          //Exécution de la requête
           $sth->execute();
 
           //Ajout du texte pour l'utilisateur dans une variable et de la valeur pour déterminer si c'est un succès ou une erreur
@@ -348,10 +362,13 @@ if (isset($_POST['ajouter_auteur'])) {
     /* Requete SQL Insert dans la table "auteurs" */
     $sql_insert = "INSERT INTO auteurs (nom,prenom) VALUES (:nom, :prenom)";
 
-    //Sécurisation des données envoyées
+
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_insert);
+    //Sécurisation des données envoyées
     $sth->bindValue(':nom', $_POST['nom'], PDO::PARAM_STR);
     $sth->bindValue(':prenom', $_POST['prenom'], PDO::PARAM_STR);
+    //Exécution de la requête
     $result = $sth->execute();
 
     //Ajout du texte pour l'utilisateur dans une variable et de la valeur pour déterminer si c'est un succès ou une erreur
@@ -384,9 +401,13 @@ if (isset($_REQUEST['supprimer_auteur'])) {
     //en fonction du nombre d'éléments à supprimer
     for ($i=0;$i<count($checkbox);$i++) {
         $del_id = $checkbox[$i];
+
+        //Requête SQL afin de supprimer l'auteur sélectionné
         $sql_delete = "DELETE FROM auteurs WHERE id='$del_id';";
+        //Requête SQL afin de mettre à jour les articles auxquels l'auteur était lié
         $sql_update = "UPDATE articles SET id_auteur = 0 WHERE id_auteur = '$del_id';";
-        //Préparation à l'exécution des requêtes
+
+        //Préparation à l'exécution des requêtes en liant la config de la bdd
         $sth = $bdd->prepare($sql_delete);
         $sth_update = $bdd->prepare($sql_update);
         //Exécution des requêtes

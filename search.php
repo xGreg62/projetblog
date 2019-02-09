@@ -34,6 +34,7 @@ if (isset($_GET['rechercher'])) {
     //car lorsqu'on est connecté, TOUS les articles sont affichés
     if (isset($_COOKIE['sid'])) {
         //Requête SQL permettant de rechercher TOUS les articles
+        //avec calcul du nombre de commentaires liés aux articles
         $sql_select_search =
         "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article,COUNT(t3.message) as 'nb',
         DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
@@ -51,8 +52,12 @@ if (isset($_GET['rechercher'])) {
           OR t1.date LIKE :search)
         GROUP BY t1.id
         ORDER BY t1.date";
+
+        //Préparation à l'exécution de la requête en liant la config de la bdd
         $sth = $bdd->prepare($sql_select_search);
+        //Sécurisation des données
         $sth->bindValue(':search', $val_search, PDO::PARAM_STR);
+        //Exécution de la requête
         $sth->execute();
 
         //On met les valeurs récupérées dans un tableau
@@ -91,6 +96,8 @@ if (isset($_GET['rechercher'])) {
     //Sinon si $_COOKIE['sid'] n'est pas défini (permet de définir si on est connecté ou pas)
     //car lorsqu'on n'est pas connecté, seuls les articles publiés sont affichés
     elseif (!isset($_COOKIE['sid'])) {
+        //Requête SQL permettant de rechercher seulement les articles publiés
+        //avec calcul du nombre de commentaires liés aux articles
         $sql_select_search =
         "SELECT t1.id,t1.titre,SUBSTRING(t1.texte, 1, 150) AS texte,t1.publie,t2.nom,t2.prenom,t3.id_article,COUNT(t3.message) as 'nb',
         DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
@@ -109,8 +116,12 @@ if (isset($_GET['rechercher'])) {
           OR t1.date LIKE :search)
         GROUP BY t1.id
         ORDER BY t1.date";
+
+        //Préparation à l'exécution de la requête en liant la config de la bdd
         $sth = $bdd->prepare($sql_select_search);
+        //Sécurisation des données envoyées
         $sth->bindValue(':search', $val_search, PDO::PARAM_STR);
+        //Exécution de la requête
         $sth->execute();
 
         //On met les valeurs récupérées dans un tableau

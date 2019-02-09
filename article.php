@@ -19,11 +19,13 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'default';
 /*** Si type est vide ou n'existe pas -> affichage page pour ajouter/gérer article ***/
 if($type == "default") {
 
-  /* @var $bdd PDO*/
+  //Requête SQL afin de sélectionner tous les auteurs
+  //afin de les afficher dans une liste de sélection
   $sql_select = "SELECT * FROM auteurs";
 
-  //Sécurisation des données envoyées
+  //Préparation à l'exécution de la requête en liant la config de la bdd
   $sth = $bdd->prepare($sql_select);
+  //Exécution de la requête
   $tab_auteurs = $sth->execute();
 
   //On met les valeurs récupérées dans un tableau
@@ -36,6 +38,7 @@ if($type == "default") {
   $smarty->setTemplateDir('templates/');
   $smarty->setCompileDir('templates_c/');
 
+  /*Envoie des variables à Smarty*/
   //Envoie de la variable $is_logged_in afin de vérifier si on est connecté ou non
   $smarty->assign('is_logged_in', $is_logged_in);
   //Envoie de la variable $type afin de permettre à Smarty d'afficher la bonne page
@@ -56,6 +59,8 @@ if($type == "default") {
 /*** Si type == read -> affichage page de lecture d'article ***/
 if ($type == "read" ) {
 
+    //Requête SQL de sélection d'article avec les commentaires liés à celui-ci
+    //afin d'afficher l'ensemble des données récupérées sur une page de lecture d'article
     $sql_select = "SELECT t1.id,t1.titre,t1.texte,t1.publie,t2.nom,t2.prenom,t3.id_article,t3.pseudo,t3.email,t3.message,
     DATE_FORMAT(t3.date, '%d/%m/%Y') AS datemsg,
     DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
@@ -69,9 +74,11 @@ if ($type == "read" ) {
     WHERE t1.id = :art_id
     ORDER BY datefr";
 
-  //Sécurisation des données envoyées
+  //Préparation à l'exécution de la requête en liant la config de la bdd
   $sth = $bdd->prepare($sql_select);
+  //Sécurisation des données envoyées
   $sth->bindValue(':art_id', $_GET['id'], PDO::PARAM_INT);
+  //Exécution de la requête
   $tab_article = $sth->execute();
 
   //On met les valeurs récupérées dans un tableau
@@ -84,6 +91,7 @@ if ($type == "read" ) {
   $smarty->setTemplateDir('templates/');
   $smarty->setCompileDir('templates_c/');
 
+  /*Envoie des données à Smarty*/
   //Envoie de la variable $is_logged_in afin de vérifier si on est connecté ou non
   $smarty->assign('is_logged_in', $is_logged_in);
   //Envoie de la variable $type afin de permettre à Smarty d'afficher la bonne page
@@ -113,7 +121,7 @@ if ($type == "read" ) {
 /*** Si type == edit -> affichage page modifier article ***/
 if ($type == "edit" ) {
 
-  /* @var $bdd PDO*/
+  //Requête SQL de sélection d'article afin de l'afficher sur une page d'édition
   $sql_select_article = "SELECT t1.id,t1.titre,t1.texte,t1.publie,t1.id_auteur,t2.nom,t2.prenom,
   DATE_FORMAT(t1.date, '%d/%m/%Y') AS datefr
   FROM articles t1
@@ -123,16 +131,19 @@ if ($type == "edit" ) {
   WHERE t1.id = :art_id
   ORDER BY date";
 
+  //Requête SQL de sélection des auteurs
   $sql_select_auteurs = "SELECT * FROM auteurs";
 
-  //Sécurisation des données envoyées
+  //Préparation à l'exécution des requêtes en liant la config de la bdd
   $sth_art = $bdd->prepare($sql_select_article);
-  $sth_art->bindValue(':art_id', $_GET['id'], PDO::PARAM_INT);
   $sth_aut = $bdd->prepare($sql_select_auteurs);
+  //Sécurisation des données envoyées
+  $sth_art->bindValue(':art_id', $_GET['id'], PDO::PARAM_INT);
+  //Exécution des requêtes
   $tab_articles = $sth_art->execute();
   $tab_auteurs = $sth_aut->execute();
 
-  //On met les valeurs récupérées dans un tableau
+  //On met les valeurs récupérées dans des tableaux
   $tab_article = $sth_art->fetchAll(PDO::FETCH_ASSOC);
   $tab_auteurs = $sth_aut->fetchAll(PDO::FETCH_ASSOC);
 
@@ -142,6 +153,7 @@ if ($type == "edit" ) {
   $smarty->setTemplateDir('templates/');
   $smarty->setCompileDir('templates_c/');
 
+  /*Envoie des variables à Smarty*/
   //Envoie de la variable $is_logged_in afin de vérifier si on est connecté ou non
   $smarty->assign('is_logged_in', $is_logged_in);
   //Envoie de la variable $type afin de permettre à Smarty d'afficher la bonne page
@@ -163,12 +175,14 @@ if ($type == "edit" ) {
 /*** Si type == delete -> affichage page supprimer article ***/
 if ($type == "delete" ) {
 
-  /* @var $bdd PDO*/
+  //Requête SQL de sélection d'article
   $sql_select = "SELECT * FROM articles WHERE id= :art_id";
 
-  //Sécurisation des données envoyées
+  //Préparation à l'exécution de la requête en liant la config de la bdd
   $sth = $bdd->prepare($sql_select);
+  //Sécurisation des données envoyées
   $sth->bindValue(':art_id', $_GET['id'], PDO::PARAM_INT);
+  //Exécution de la requête
   $tab_article = $sth->execute();
 
   //On met les valeurs récupérées dans un tableau
@@ -180,6 +194,7 @@ if ($type == "delete" ) {
   $smarty->setTemplateDir('templates/');
   $smarty->setCompileDir('templates_c/');
 
+  /*Envoie des variables à Smarty*/
   //Envoie de la variable $is_logged_in afin de vérifier si on est connecté ou non
   $smarty->assign('is_logged_in', $is_logged_in);
   //Envoie de la variable $type afin de permettre à Smarty d'afficher la bonne page

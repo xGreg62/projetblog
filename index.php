@@ -46,10 +46,13 @@ if (isset($_COOKIE['sid'])) {
           ORDER BY t1.date
           LIMIT :index_depart, :nb_limit";
 
-    //Sécurisation des données
+
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_select_connecte);
+    //Sécurisation des données
     $sth->bindValue(':index_depart', $index_depart, PDO::PARAM_INT);
     $sth->bindValue(':nb_limit', _nb_art_page, PDO::PARAM_INT);
+    //Exécution de la requête
     $sth->execute();
 
     //On met les valeurs récupérées dans un tableau
@@ -102,10 +105,13 @@ elseif (!isset($_COOKIE['sid'])) {
         ORDER BY t1.date
         LIMIT :index_depart, :nb_limit";
 
+    //Préparation à l'exécution de la requête en liant la config de la bdd
     $sth = $bdd->prepare($sql_select_non_connecte);
+    //Sécurisation des données
     $sth->bindValue(':publie', 1, PDO::PARAM_BOOL);
     $sth->bindValue(':index_depart', $index_depart, PDO::PARAM_INT);
     $sth->bindValue(':nb_limit', _nb_art_page, PDO::PARAM_INT);
+    //Exécution de la requête
     $sth->execute();
 
     //On met les valeurs récupérées dans un tableau
